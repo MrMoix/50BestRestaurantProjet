@@ -8,9 +8,9 @@ object Restaurant {
 
 
     val reader = CSVReader.open(new File("src/main/02-50BestRestaurants.csv"))
-    val t = reader.toStream
+    val dataset = reader.toStream
 
 
-    print(t.toList)
+    dataset.drop(1).foreach(t => for (test <- t) println(test.trim))
   }
 }
