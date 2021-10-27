@@ -13,46 +13,67 @@ object Restaurant extends App {
 
   }
 
-  case class Restaurant(ranking: Int, name: String, city: String, country: String, lat: Double, lon: Double, stars: String, chef: String, website: String, menu: Double, currency: String, description: String) extends Activity {
-    def intial(menu: Double) = menu
+  case class Restaurant(ranking: Int, name: String, city: String, country: String, lat: Double, lon: Double, stars: String, chef: String, website: String, menu: Double, currency: String, description: String) extends Activity
 
-    def increase(menu: Double) = (menu + menu * 0.5).toDouble
-  }
+  case class RestaurantWithHigherOrder(ranking: Int, name: String, city: String, country: String, lat: Double, lon: Double, stars: String, chef: String, website: String, menu: Double => Double, currency: String, description: String) extends Activity
 
+  case class Menu(menu: Double)
 
+  case class RestaurantName(name: String)
+
+  def intial(menu: Double) = menu
+
+  def increase(menu: Double) = (menu + menu * 0.5).toDouble
+
+  //CSV Reader
   val reader = CSVReader.open(new File("src/main/02-50BestRestaurants.csv"))
   val dataset = reader.toStream.toList.drop(1)
 
+  //Initailization of the data
   val restaurants = dataset.map(resto => Restaurant(resto(0).toInt, resto(1).trim, resto(2), resto(3), resto(4).toDouble, resto(5).toDouble, resto(6), resto(7), resto(8), resto(9).toDouble, resto(10), resto(11)))
-
-  val resto1Price = restaurants(0).intial(restaurants(0).menu)
-  //println(resto1Price)
-  //println(restaurants(0).increase(restaurants(0).menu))
+  val restaurantsName = dataset.map(resto => RestaurantName(resto(1).trim))
+  val restaurantsMenu = dataset.map(resto => Menu(resto(9).toDouble))
 
 
-  //println("Prix initial: " + resto1Price)
+  // Higher order function
+  val test1 = restaurants(0)
 
-  //restaurants.foreach(println)
-  //insertColumn.foreach(println)
-  //println(restaurants)
+  val resto1IncreasePrice = RestaurantWithHigherOrder(test1.ranking, test1.name, test1.city, test1.country, test1.lat, test1.lon, test1.stars, test1.chef, test1.website, increase, test1.currency, test1.description)
 
-  val test = restaurants.filter(x => restaurants(x.ranking - 1).ranking.toInt <= 10)
-  //test.foreach(println)
+  val menu = Seq(resto1IncreasePrice)
 
-  val test2 = restaurants.groupBy(x => x.country.contains("France")).map(x => x._2)
-  //test2.foreach(println)
+  val menuResto1 = menu.map(e => e.menu(test1.menu))
 
-  val test3 = restaurants.sortBy(_.name).map(_.name)
-  test3.foreach(println)
-
-  val test4 = restaurants.filter(x => x.currency.contains("EUR")).map(x => x.name)
-
-  //test4.foreach(println)
-
-  val test5 = restaurants.filter(x => x.stars.contains("3")).filter(x => x.currency.contains("EUR")).map(x => x.menu).sum / restaurants.filter(x => x.stars.contains("3")).filter(x => x.currency.contains("EUR")).length
+  //println(menuResto1)
 
 
-  print("Prix moyen du menu des restaurants 3 étoiles en EUR : "+test5)
+  // 5 data exploration
+  //Display the french restaurant in the top 10
+  val dataExploration1 = restaurants.filter(x => restaurants(x.ranking - 1).ranking.toInt <= 10).filter(x => x.country.equals("France"))
+  //dataExploration1.foreach(println)
 
+
+  //Diplay all restaurants name with a https website
+  val dataExploration2 = restaurants.groupBy(x => x.website.contains("https")).map(x => x._2)
+  //dataExploration2.drop(1).map(x => x.map { y => y.name }.foreach(println))
+
+
+  //Filter alphabetic order
+  val dataExploration3 = restaurants.sortBy(_.name).map(_.name)
+  //dataExploration3.foreach(println)
+
+
+  val dataExploration4 = restaurants.filter(x => x.currency.contains("EUR")).map(x => x.name)
+
+  //dataExploration4.foreach(println)
+
+
+  //Display the avreage price for the restaurants with 3 Stars and with the currency EUR //Aggregation fonction
+  val dataExploration5 = restaurants.filter(x => x.stars.contains("3")).filter(x => x.currency.contains("EUR")).map(x => x.menu).sum / restaurants.filter(x => x.stars.contains("3")).filter(x => x.currency.contains("EUR")).length
+
+  println("Prix moyen du menu des restaurants 3 étoiles en EUR : " + dataExploration5.toInt + "\n")
+
+  val dataExploration6 = restaurantsName.zip(restaurantsMenu)
+  dataExploration6.foreach(println)
 
 }
