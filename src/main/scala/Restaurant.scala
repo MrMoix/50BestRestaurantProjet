@@ -44,6 +44,21 @@ object Restaurant extends App {
     }
   }
 
+  def reverseList(list: List[Restaurant]): List[Restaurant] = {
+    def rlRec(result: List[Restaurant], list: List[Restaurant]): List[Restaurant] = {
+      list match {
+        case Nil => result
+        case (x :: xs) => {
+          rlRec(x :: result, xs)
+        }
+      }
+    }
+
+    rlRec(Nil, list)
+  }
+
+  reverseList(restaurants).foreach(println)
+
   val restaurantsEuro = restaurants.filter(x => x.currency.contains("EUR"))
 
   //Ranking modification
@@ -68,7 +83,9 @@ object Restaurant extends App {
 
   //Futures
 
-
+  //Exception handling
+  val test12 = restaurants.size
+  val test = restaurants.count(x => x.country.contains("France"))
 
 
   // Higher order function
