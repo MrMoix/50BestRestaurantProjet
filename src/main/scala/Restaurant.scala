@@ -1,6 +1,7 @@
 import com.github.tototoshi.csv.CSVReader
 
 import java.io.File
+import scala.annotation.tailrec
 
 object Restaurant extends App {
 
@@ -25,14 +26,6 @@ object Restaurant extends App {
 
   def increase(menu: Double) = (menu + menu * 0.5).toDouble
 
-  def stars(line: Int) = restaurants(line).stars match {
-    case "0" => "No star"
-    case "1" => "1 star"
-    case "2" => "2 stars"
-    case "3" => "3 stars"
-    case _ => "Star unknown"
-  }
-
   //CSV Reader
   val reader = CSVReader.open(new File("src/main/02-50BestRestaurants.csv"))
   val dataset = reader.toStream.toList.drop(1)
@@ -43,14 +36,55 @@ object Restaurant extends App {
   val restaurantsMenu = dataset.map(resto => Menu(resto(9).toDouble))
 
   //Recursion
+  def reverseList(list: List[Restaurant]): List[Restaurant] = {
+    def rlRec(result: List[Restaurant], list: List[Restaurant]): List[Restaurant] = {
+      list match {
+        case Nil => result
+        case (x :: xs) => {
+          rlRec(x :: result, xs)
+        }
+      }
+    }
+
+    rlRec(Nil, list)
+  }
+
+
+  reverseList(restaurants).foreach(println)
+
+  def recursiveLenghtCalculator(list: List[Restaurant]): Long = list match {
+    case Nil => 0
+    case head :: tail => {
+      val accumulator = recursiveLenghtCalculator(tail)
+      1 + accumulator
+    }
+  }
+
+  val restaurantsEuro = restaurants.filter(x => x.currency.contains("EUR"))
+
+  //Ranking modification
+  /*  def changeRank(restaurant: Restaurant, rankinPos: Int, rankin2 : Int) =
+    restaurants.foreach(println)
+
+    val newRestaurantsRanking = restaurants.map(resto => Restaurant(resto.ranking, changeRank(resto, 2, 4), resto.city, resto.country, resto.lat, resto.lon, resto.stars, resto.chef, resto.website, resto.menu, resto.currency, resto.description))
+    newRestaurantsRanking.foreach(println)*/
+
 
   //Match case
+  def stars(restaurant: Restaurant) = restaurant.stars match {
+    case "0" => "No star"
+    case "1" => "1 star"
+    case "2" => "2 stars"
+    case "3" => "3 stars"
+    case _ => "Star unknown"
+  }
 
-  val restaurant2 = restaurants.map(resto => Restaurant(resto.ranking, resto.name, resto.city, resto.country, resto.lat, resto.lon, stars(resto.ranking-1), resto.chef, resto.website, resto.menu, resto.currency, resto.description))
-  restaurant2.foreach(println)
-  //Exception handling
+  val restaurant2 = restaurants.map(resto => Restaurant(resto.ranking, resto.name, resto.city, resto.country, resto.lat, resto.lon, stars(resto), resto.chef, resto.website, resto.menu, resto.currency, resto.description))
+  //restaurant2.foreach(println)
 
   //Futures
+
+
 
 
   // Higher order function
@@ -61,13 +95,15 @@ object Restaurant extends App {
   val menu = Seq(resto1IncreasePrice)
 
   val menuResto1 = menu.map(e => e.menu(test1.menu))
-
   //println(menuResto1)
 
+  //Exception handling
+  val test12 = restaurants.size
+  val test = restaurants.count(x => x.country.contains("France"))
 
   // 5 data exploration
   //Display the french restaurant in the top 10
-  val dataExploration1 = restaurants.filter(x => restaurants(x.ranking - 1).ranking.toInt <= 10).filter(x => x.country.equals("France"))
+  val dataExploration1 = restaurants.filter(x => x.ranking <= 10).filter(x => x.country.equals("France"))
   //dataExploration1.foreach(println)
 
 
@@ -87,11 +123,14 @@ object Restaurant extends App {
 
 
   //Display the avreage price for the restaurants with 3 Stars and with the currency EUR //Aggregation fonction
-  val dataExploration5 = restaurants.filter(x => x.stars.contains("3")).filter(x => x.currency.contains("EUR")).map(x => x.menu).sum / restaurants.filter(x => x.stars.contains("3")).filter(x => x.currency.contains("EUR")).length
+  val restaurants3StarsWithEuro = restaurants.filter(x => x.stars.contains("3")).filter(x => x.currency.contains("EUR"))
+  val dataExploration5 = restaurants.filter(x => x.stars.contains("3")).filter(x => x.currency.contains("EUR")).map(x => x.menu).sum / recursiveLenghtCalculator(restaurants3StarsWithEuro)
 
   //println("Prix moyen du menu des restaurants 3 étoiles en EUR : " + dataExploration5.toInt + "\n")
 
   val dataExploration6 = restaurantsName.zip(restaurantsMenu)
   //dataExploration6.foreach(println)
 
+  val AverageMenuPerCountry = restaurants.groupBy(m => m.country).view.mapValues({gs => gs.map(_.menu).sum/gs.length.toFloat})
+  AverageMenuPerCountry.foreach(println)
 }
