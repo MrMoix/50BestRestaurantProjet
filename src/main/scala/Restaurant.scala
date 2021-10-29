@@ -25,6 +25,14 @@ object Restaurant extends App {
 
   def increase(menu: Double) = (menu + menu * 0.5).toDouble
 
+  def stars(line: Int) = restaurants(line).stars match {
+    case "0" => "No star"
+    case "1" => "1 star"
+    case "2" => "2 stars"
+    case "3" => "3 stars"
+    case _ => "Star unknown"
+  }
+
   //CSV Reader
   val reader = CSVReader.open(new File("src/main/02-50BestRestaurants.csv"))
   val dataset = reader.toStream.toList.drop(1)
@@ -33,6 +41,16 @@ object Restaurant extends App {
   val restaurants = dataset.map(resto => Restaurant(resto(0).toInt, resto(1).trim, resto(2), resto(3), resto(4).toDouble, resto(5).toDouble, resto(6), resto(7), resto(8), resto(9).toDouble, resto(10), resto(11)))
   val restaurantsName = dataset.map(resto => RestaurantName(resto(1).trim))
   val restaurantsMenu = dataset.map(resto => Menu(resto(9).toDouble))
+
+  //Recursion
+
+  //Match case
+
+  val restaurant2 = restaurants.map(resto => Restaurant(resto.ranking, resto.name, resto.city, resto.country, resto.lat, resto.lon, stars(resto.ranking-1), resto.chef, resto.website, resto.menu, resto.currency, resto.description))
+  restaurant2.foreach(println)
+  //Exception handling
+
+  //Futures
 
 
   // Higher order function
@@ -71,9 +89,9 @@ object Restaurant extends App {
   //Display the avreage price for the restaurants with 3 Stars and with the currency EUR //Aggregation fonction
   val dataExploration5 = restaurants.filter(x => x.stars.contains("3")).filter(x => x.currency.contains("EUR")).map(x => x.menu).sum / restaurants.filter(x => x.stars.contains("3")).filter(x => x.currency.contains("EUR")).length
 
-  println("Prix moyen du menu des restaurants 3 étoiles en EUR : " + dataExploration5.toInt + "\n")
+  //println("Prix moyen du menu des restaurants 3 étoiles en EUR : " + dataExploration5.toInt + "\n")
 
   val dataExploration6 = restaurantsName.zip(restaurantsMenu)
-  dataExploration6.foreach(println)
+  //dataExploration6.foreach(println)
 
 }
