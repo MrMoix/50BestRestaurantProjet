@@ -43,14 +43,15 @@ object Restaurant extends App {
       1 + accumulator
     }
   }
+
   val restaurantsEuro = restaurants.filter(x => x.currency.contains("EUR"))
 
   //Ranking modification
-  def changeRank(restaurant: Restaurant) = 2
+/*  def changeRank(restaurant: Restaurant, rankinPos: Int, rankin2 : Int) =
+  restaurants.foreach(println)
 
-  val newRestaurantsRanking = restaurants.map(resto => Restaurant(changeRank(resto), resto.name, resto.city, resto.country, resto.lat, resto.lon, resto.stars, resto.chef, resto.website, resto.menu, resto.currency, resto.description))
-  //newRestaurantsRanking.foreach(println)
-
+  val newRestaurantsRanking = restaurants.map(resto => Restaurant(resto.ranking, changeRank(resto, 2, 4), resto.city, resto.country, resto.lat, resto.lon, resto.stars, resto.chef, resto.website, resto.menu, resto.currency, resto.description))
+  newRestaurantsRanking.foreach(println)*/
 
 
   //Match case
@@ -61,10 +62,13 @@ object Restaurant extends App {
     case "3" => "3 stars"
     case _ => "Star unknown"
   }
+
   val restaurant2 = restaurants.map(resto => Restaurant(resto.ranking, resto.name, resto.city, resto.country, resto.lat, resto.lon, stars(resto), resto.chef, resto.website, resto.menu, resto.currency, resto.description))
   //restaurant2.foreach(println)
 
   //Futures
+
+
 
 
   // Higher order function
@@ -108,4 +112,6 @@ object Restaurant extends App {
   val dataExploration6 = restaurantsName.zip(restaurantsMenu)
   //dataExploration6.foreach(println)
 
+  val AverageMenuPerCountry = restaurants.groupBy(m => m.country).view.mapValues({gs => gs.map(_.menu).sum/gs.length.toFloat})
+  AverageMenuPerCountry.foreach(println)
 }
