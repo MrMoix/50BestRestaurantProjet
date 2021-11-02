@@ -1,8 +1,8 @@
 # 50BestRestaurantProjet
 
-It is a project for the HES-SO Valais/Wallis in the Scala classe given by Professor Jean-Paul Calbimonte Pérez
+## It is a project for the HES-SO Valais/Wallis in the Scala classe given by Professor <b>Jean-Paul Calbimonte Pérez<b>.
 
-Here is the guideline we had in order to implement the project.
+### Here is the guideline we had in order to implement the project :
 
 This micro project is an exercise to practice functional programming principles using Scala. Each group is expected to:
 
