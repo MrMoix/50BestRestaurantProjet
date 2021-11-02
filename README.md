@@ -1,6 +1,7 @@
 # 50BestRestaurantProjet
 
-## It is a project for the HES-SO Valais/Wallis in the Scala classe given by Professor Jean-Paul Calbimonte Pérez.
+## It is a project for the HES-SO Valais/Wallis in the Scala classe given by Professor 
+## Jean-Paul Calbimonte Pérez.
 
 ### Here is the guideline we had in order to implement the project :
 
