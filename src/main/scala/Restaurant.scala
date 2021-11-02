@@ -3,7 +3,7 @@ import com.github.tototoshi.csv.CSVReader
 import java.io.File
 import scala.annotation.tailrec
 import scala.concurrent.Future
-import scala.concurrent.ExecutionException
+import scala.concurrent.ExecutionContext.Implicits.global
 
 object Restaurant extends App {
 
@@ -24,7 +24,7 @@ object Restaurant extends App {
 
   case class RestaurantName(name: String)
 
-  def intial(menu: Double) = menu
+  def initial(menu: Double) = menu
 
   def increase(menu: Double) = (menu + menu * 0.5).toDouble
 
@@ -83,28 +83,35 @@ object Restaurant extends App {
   val restaurant2 = restaurants.map(resto => Restaurant(resto.ranking, resto.name, resto.city, resto.country, resto.lat, resto.lon, stars(resto), resto.chef, resto.website, resto.menu, resto.currency, resto.description))
   //restaurant2.foreach(println)
 
-  //Futures
-
-
-
   //Exception handling
   val totalRestaurant = restaurants.size
-  val totalRestaurantFrance = restaurants.count(x => x.country.contains("France"))
-  val totalRestaurantSuisse = restaurants.count(x => x.country.contains("Suisse"))
+  val totalRestaurantFrance = restaurants.count(x => x.country.contains("France")) //number of restaurant 5
+  val totalRestaurantSuisse = restaurants.count(x => x.country.contains("Suisse")) //number of restaurant 0
 
-  def ratioRestaurantPerCountry(totalRestaurantInACountry: Int, totalRestaurant: Int)= {
+  def ratioRestaurantPerCountry(totalRestaurantInACountry: Int, totalRestaurant: Int) = {
     try {
       val ratio = (totalRestaurantInACountry / totalRestaurant) * 100.toFloat
 
     } catch {
       case ex: Exception => println("We got an error" + ex.getMessage)
     }
-
-
   }
 
-  ratioRestaurantPerCountry(totalRestaurant, totalRestaurantFrance)
-  ratioRestaurantPerCountry(totalRestaurant, totalRestaurantSuisse)
+  //ratioRestaurantPerCountry(totalRestaurant, totalRestaurantFrance)
+  //ratioRestaurantPerCountry(totalRestaurant, totalRestaurantSuisse)
+
+
+  //Futures
+  def tryDivide(overallRestoInACountry: Int): Future[Int] = {    if (overallRestoInACountry == 0) {
+      Future.failed(new IllegalArgumentException("Don't divide by zero"))
+    } else {
+      Future(totalRestaurant / overallRestoInACountry)
+    }
+  }
+
+  //println(tryDivide(totalRestaurantFrance))
+  //println(tryDivide(totalRestaurantSuisse))
+
 
   // Higher order function
   val test1 = restaurants(0)
@@ -114,7 +121,7 @@ object Restaurant extends App {
   val menu = Seq(resto1IncreasePrice)
 
   val menuResto1 = menu.map(e => e.menu(test1.menu))
-  //println(menuResto1)
+  println(menuResto1)
 
 
   // 5 data exploration
@@ -140,7 +147,7 @@ object Restaurant extends App {
 
   //Display the avreage price for the restaurants with 3 Stars and with the currency EUR //Aggregation fonction
   val restaurants3StarsWithEuro = restaurants.filter(x => x.stars.contains("3")).filter(x => x.currency.contains("EUR"))
-  val dataExploration5 = restaurants.filter(x => x.stars.contains("3")).filter(x => x.currency.contains("EUR")).map(x => x.menu).sum / recursiveLenghtCalculator(restaurants3StarsWithEuro)
+  val dataExploration5 = restaurants3StarsWithEuro.map(x => x.menu).sum / recursiveLenghtCalculator(restaurants3StarsWithEuro)
 
   //println("Prix moyen du menu des restaurants 3 étoiles en EUR : " + dataExploration5.toInt + "\n")
 
@@ -149,4 +156,5 @@ object Restaurant extends App {
 
   val AverageMenuPerCountry = restaurants.groupBy(m => m.country).view.mapValues({ gs => gs.map(_.menu).sum / gs.length.toFloat })
   //AverageMenuPerCountry.foreach(println)
+
 }
