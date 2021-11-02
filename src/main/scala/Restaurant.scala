@@ -2,6 +2,8 @@ import com.github.tototoshi.csv.CSVReader
 
 import java.io.File
 import scala.annotation.tailrec
+import scala.concurrent.Future
+import scala.concurrent.ExecutionException
 
 object Restaurant extends App {
 
@@ -57,16 +59,16 @@ object Restaurant extends App {
     rlRec(Nil, list)
   }
 
-  reverseList(restaurants).foreach(println)
+  //reverseList(restaurants).foreach(println)
 
-  val restaurantsEuro = restaurants.filter(x => x.currency.contains("EUR"))
+  //val restaurantsEuro = restaurants.filter(x => x.currency.contains("EUR"))
 
   //Ranking modification
-/*  def changeRank(restaurant: Restaurant, rankinPos: Int, rankin2 : Int) =
-  restaurants.foreach(println)
+  /*  def changeRank(restaurant: Restaurant, rankinPos: Int, rankin2 : Int) =
+    restaurants.foreach(println)
 
-  val newRestaurantsRanking = restaurants.map(resto => Restaurant(resto.ranking, changeRank(resto, 2, 4), resto.city, resto.country, resto.lat, resto.lon, resto.stars, resto.chef, resto.website, resto.menu, resto.currency, resto.description))
-  newRestaurantsRanking.foreach(println)*/
+    val newRestaurantsRanking = restaurants.map(resto => Restaurant(resto.ranking, changeRank(resto, 2, 4), resto.city, resto.country, resto.lat, resto.lon, resto.stars, resto.chef, resto.website, resto.menu, resto.currency, resto.description))
+    newRestaurantsRanking.foreach(println)*/
 
 
   //Match case
@@ -83,10 +85,26 @@ object Restaurant extends App {
 
   //Futures
 
-  //Exception handling
-  val test12 = restaurants.size
-  val test = restaurants.count(x => x.country.contains("France"))
 
+
+  //Exception handling
+  val totalRestaurant = restaurants.size
+  val totalRestaurantFrance = restaurants.count(x => x.country.contains("France"))
+  val totalRestaurantSuisse = restaurants.count(x => x.country.contains("Suisse"))
+
+  def ratioRestaurantPerCountry(totalRestaurantInACountry: Int, totalRestaurant: Int)= {
+    try {
+      val ratio = (totalRestaurantInACountry / totalRestaurant) * 100.toFloat
+
+    } catch {
+      case ex: Exception => println("We got an error" + ex.getMessage)
+    }
+
+
+  }
+
+  ratioRestaurantPerCountry(totalRestaurant, totalRestaurantFrance)
+  ratioRestaurantPerCountry(totalRestaurant, totalRestaurantSuisse)
 
   // Higher order function
   val test1 = restaurants(0)
@@ -129,6 +147,6 @@ object Restaurant extends App {
   val dataExploration6 = restaurantsName.zip(restaurantsMenu)
   //dataExploration6.foreach(println)
 
-  val AverageMenuPerCountry = restaurants.groupBy(m => m.country).view.mapValues({gs => gs.map(_.menu).sum/gs.length.toFloat})
-  AverageMenuPerCountry.foreach(println)
+  val AverageMenuPerCountry = restaurants.groupBy(m => m.country).view.mapValues({ gs => gs.map(_.menu).sum / gs.length.toFloat })
+  //AverageMenuPerCountry.foreach(println)
 }
